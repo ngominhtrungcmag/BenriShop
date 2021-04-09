@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BenriShop.Models;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
+using System.Web.Helpers;
+using System.Net.Http;
 
 namespace BenriShop.Controllers
 {
@@ -23,7 +26,11 @@ namespace BenriShop.Controllers
         }
 
         #region Admin
-        // GET: api/Accounts
+        /// <summary>
+        /// Lấy toàn bộ danh sach tài khoản của database
+        /// </summary>
+        /// <returns></returns>
+        // GET: api/Accounts 
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Account>>> GetAccount()
@@ -31,6 +38,73 @@ namespace BenriShop.Controllers
             return await _context.Account.ToListAsync();
         }
 
+        /// <summary>
+        /// Lấy danh sách tài khoản Mod
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetModAccounts")]
+        public async Task<IEnumerable<Account>> GetModAccounts()
+        {
+            IQueryable<Account> query = _context.Account;
+            query = query.Where(e => e.Role.Contains("Customer"));
+            if (query != null)
+            {
+                return await query.ToListAsync();
+            }
+            else
+            {
+                return (IEnumerable<Account>)NotFound();
+            }
+        }
+
+
+        /// <summary>
+        /// Thay đổi quyền của tài khoản
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+       // [Authorize]
+        [HttpPut("ChangeRoleOfAccount/{id}")]
+        public async Task<IActionResult> ChangeRoleOfAccount([FromRoute]string id, [FromForm] Account account)
+        {
+
+            var username = account.Username;
+            var role = account.Role;
+
+            var _account = AccountInfor(username);
+
+            if (id != username)
+            {
+                return BadRequest();
+            }
+
+            
+            if (_account.Role == role || role == "" || role == null || role != "Admin" || role != "Customer" || role != "Mod")
+            {
+                return BadRequest();
+            }
+            _account.Role = role;
+
+            _context.Entry(_account).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!AccountExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
 
         // DELETE: api/Accounts/5
         [Authorize]
@@ -158,6 +232,11 @@ namespace BenriShop.Controllers
         private bool AccountExists(string id)
         {
             return _context.Account.Any(e => e.Username == id);
+        }
+
+        private Account AccountInfor(string id)
+        {
+            return _context.Account.FirstOrDefault(e => e.Username == id);
         }
 
 

@@ -132,3 +132,9 @@ C:\Users\ngomi\source\repos\BenriShop\obj\Debug\netcoreapp3.1\BenriShop.csproj.C
 C:\Users\ngomi\source\repos\BenriShop\obj\Debug\netcoreapp3.1\BenriShop.dll
 C:\Users\ngomi\source\repos\BenriShop\obj\Debug\netcoreapp3.1\BenriShop.pdb
 C:\Users\ngomi\source\repos\BenriShop\obj\Debug\netcoreapp3.1\BenriShop.genruntimeconfig.cache
+C:\Users\ngomi\source\repos\BenriShop\bin\Debug\netcoreapp3.1\System.Web.Razor.dll
+C:\Users\ngomi\source\repos\BenriShop\bin\Debug\netcoreapp3.1\System.Web.Helpers.dll
+C:\Users\ngomi\source\repos\BenriShop\bin\Debug\netcoreapp3.1\System.Web.WebPages.Deployment.dll
+C:\Users\ngomi\source\repos\BenriShop\bin\Debug\netcoreapp3.1\System.Web.WebPages.Razor.dll
+C:\Users\ngomi\source\repos\BenriShop\bin\Debug\netcoreapp3.1\System.Web.WebPages.dll
+C:\Users\ngomi\source\repos\BenriShop\bin\Debug\netcoreapp3.1\Microsoft.Web.Infrastructure.dll
