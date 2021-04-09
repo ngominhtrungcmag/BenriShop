@@ -13,12 +13,12 @@ namespace BenriShop.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TokenController : ControllerBase
+    public class LoginsController : ControllerBase
     {
         public IConfiguration _configuration;
         private readonly BenriShopContext _context;
 
-        public TokenController(IConfiguration config, BenriShopContext context)
+        public LoginsController(IConfiguration config, BenriShopContext context)
         {
             _configuration = config;
             _context = context;
@@ -39,10 +39,11 @@ namespace BenriShop.Controllers
                     new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                    new Claim("UserName", user.Username.ToString()),
+                    //new Claim("UserName", user.Username.ToString()),
                     new Claim("FullName", user.Fullname),
                     new Claim("PhoneNumber", user.Phonenumber),
-                    new Claim("Role", user.Role),
+                    new Claim(ClaimTypes.Name, user.Username.ToString()),
+                    new Claim(ClaimTypes.Role, user.Role)
                    };
 
                     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -63,7 +64,6 @@ namespace BenriShop.Controllers
                 return BadRequest();
             }
         }
-
 
         private async Task<Account> GetAcount(string username, string password)
         {

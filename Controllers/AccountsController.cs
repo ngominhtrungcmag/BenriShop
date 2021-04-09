@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BenriShop.Controllers
 {
-    [Authorize]
+   
     [Route("api/[controller]")]
     [ApiController]
     public class AccountsController : ControllerBase
@@ -22,14 +22,41 @@ namespace BenriShop.Controllers
             _context = context;
         }
 
+        #region Admin
         // GET: api/Accounts
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Account>>> GetAccount()
         {
             return await _context.Account.ToListAsync();
         }
 
+
+        // DELETE: api/Accounts/5
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Account>> DeleteAccount(string id)
+        {
+            var account = await _context.Account.FindAsync(id);
+            if (account == null)
+            {
+                return NotFound();
+            }
+
+            _context.Account.Remove(account);
+            await _context.SaveChangesAsync();
+
+            return account;
+        }
+
+        #endregion
+
+        #region User
+
+        #region Authorize
+
         // GET: api/Accounts/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<Account>> GetAccount(string id)
         {
@@ -42,10 +69,10 @@ namespace BenriShop.Controllers
 
             return account;
         }
-
         // PUT: api/Accounts/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAccount(string id, Account account)
         {
@@ -75,10 +102,17 @@ namespace BenriShop.Controllers
             return NoContent();
         }
 
+        #endregion
+
+
+
+        #region AllowAnonymous
+
         // POST: api/Accounts
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
+        [HttpPost("CreateAccount")]
+        [AllowAnonymous]
         public async Task<ActionResult<Account>> PostAccount(Account account)
         {
             _context.Account.Add(account);
@@ -101,25 +135,34 @@ namespace BenriShop.Controllers
             return CreatedAtAction("GetAccount", new { id = account.Username }, account);
         }
 
-        // DELETE: api/Accounts/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Account>> DeleteAccount(string id)
+        [HttpPost("CheckAccount")]
+        [AllowAnonymous]
+        public IActionResult CheckAccount(Account account)
         {
-            var account = await _context.Account.FindAsync(id);
-            if (account == null)
+            if (AccountExists(account.Username))
             {
-                return NotFound();
+                return Conflict("Trùng tài khoản");
             }
-
-            _context.Account.Remove(account);
-            await _context.SaveChangesAsync();
-
-            return account;
+            else
+            {
+                return Ok("Có thể tạo");
+            }
         }
+
+        #endregion
+
+        #endregion
+
+        #region Method
 
         private bool AccountExists(string id)
         {
             return _context.Account.Any(e => e.Username == id);
         }
+
+
+        #endregion
+
+
     }
 }
